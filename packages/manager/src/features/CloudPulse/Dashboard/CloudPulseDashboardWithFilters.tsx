@@ -176,6 +176,7 @@ export const CloudPulseDashboardWithFilters = React.memo(
             {isFilterBuilderNeeded && (
               <CloudPulseDashboardFilterBuilder
                 dashboard={dashboard}
+                database_ids={[resource]}
                 emitFilterChange={onFilterChange}
                 handleToggleAppliedFilter={toggleAppliedFilter}
                 isServiceAnalyticsIntegration

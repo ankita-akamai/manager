@@ -11,6 +11,7 @@ import {
   constructAdditionalRequestFilters,
   getCustomSelectProperties,
   getMetricsCallCustomFilters,
+  getNodeTypeProperties,
   getRegionProperties,
   getResourcesProperties,
   getTimeDurationProperties,
@@ -24,6 +25,8 @@ const mockDashboard = dashboardFactory.build();
 const linodeConfig = FILTER_CONFIG.get('linode');
 
 const dbaasConfig = FILTER_CONFIG.get('dbaas');
+
+const dbaasDashboard = dashboardFactory.build({ service_type: 'dbaas' });
 
 it('test getRegionProperties method', () => {
   const regionConfig = linodeConfig?.filters.find(
@@ -145,6 +148,36 @@ it('test getResourceSelectionProperties method with disabled true', () => {
   }
 });
 
+it('test getNodeTypeProperties', () => {
+  const nodeTypeSelectionConfig = dbaasConfig?.filters.find(
+    (filterObj) => filterObj.name === 'Node Type'
+  );
+
+  expect(nodeTypeSelectionConfig).toBeDefined();
+
+  if (nodeTypeSelectionConfig) {
+    const {
+      disabled,
+      handleNodeTypeChange,
+      label,
+      savePreferences,
+    } = getNodeTypeProperties(
+      {
+        config: nodeTypeSelectionConfig,
+        dashboard: dbaasDashboard,
+        dependentFilters: {},
+        isServiceAnalyticsIntegration: false,
+      },
+      vi.fn()
+    );
+    const { name } = nodeTypeSelectionConfig.configuration;
+    expect(handleNodeTypeChange).toBeDefined();
+    expect(savePreferences).toEqual(true);
+    expect(disabled).toEqual(true);
+    expect(label).toEqual(name);
+  }
+});
+
 it('test checkIfWeNeedToDisableFilterByFilterKey method all cases', () => {
   let result = checkIfWeNeedToDisableFilterByFilterKey(
     'resource_id',
@@ -166,6 +199,14 @@ it('test checkIfWeNeedToDisableFilterByFilterKey method all cases', () => {
     'resource_id',
     {},
     mockDashboard
+  );
+
+  expect(result).toEqual(true);
+
+  result = checkIfWeNeedToDisableFilterByFilterKey(
+    'node_type',
+    {},
+    dbaasDashboard
   );
 
   expect(result).toEqual(true);
