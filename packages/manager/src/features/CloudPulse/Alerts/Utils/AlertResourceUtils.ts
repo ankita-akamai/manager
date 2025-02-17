@@ -59,6 +59,11 @@ interface FilterResourceProps {
    * This property helps to track the list of selected resources
    */
   selectedResources?: string[];
+
+  /**
+   * The supported regions defined in launch darkly per service type
+   */
+  supportedRegions?: Region[];
 }
 
 interface FilterRendererProps {
@@ -82,7 +87,9 @@ interface FilterRendererProps {
   /**
    * The regions to be displayed according to the resources associated with alerts
    */
-  regionOptions: Region[];
+  regionOptions?: Region[];
+
+  supportedRegions?: Region[];
 }
 
 /**
@@ -149,6 +156,7 @@ export const getFilteredResources = (
     searchText,
     selectedOnly,
     selectedResources,
+    supportedRegions,
   } = filterProps;
   if (!data || (!isAdditionOrDeletionNeeded && resourceIds.length === 0)) {
     return [];
@@ -180,8 +188,12 @@ export const getFilteredResources = (
         label.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()); // check with search text
 
       const matchesFilteredRegions =
-        !filteredRegions?.length ||
-        (region.length && filteredRegions.includes(region)); // check with filtered region
+        (!filteredRegions?.length &&
+          (!supportedRegions ||
+            supportedRegions.some((supportedRegion: Region) =>
+              region.includes(supportedRegion.id)
+            ))) ||
+        (region.length && filteredRegions?.includes(region)); // check with filtered region or check in supported regions if no region is selected
 
       return (
         matchesSearchText && // match the search text and match the region selected
@@ -295,13 +307,13 @@ export const getAlertResourceFilterProps = ({
   filterKey,
   handleFilterChange,
   handleFilteredRegionsChange: handleSelectionChange,
-  regionOptions,
+  supportedRegions,
 }: FilterRendererProps): AlertsEngineOptionProps | AlertsRegionProps => {
   switch (filterKey) {
     case 'engineType':
       return { handleFilterChange };
     case 'region':
-      return { handleSelectionChange, regionOptions };
+      return { handleSelectionChange, regionOptions: supportedRegions ?? [] };
 
     default:
       return { handleFilterChange };

@@ -10,7 +10,7 @@ export interface AlertsRegionProps {
    */
   handleSelectionChange: (regions: string[]) => void;
   /**
-   * The regions to be displayed according to the resources associated with alerts
+   * The supported regions to be displayed according to the resources associated with alerts
    */
   regionOptions: Region[];
 }

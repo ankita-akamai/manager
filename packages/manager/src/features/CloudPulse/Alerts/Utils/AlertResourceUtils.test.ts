@@ -86,6 +86,7 @@ describe('getFilteredResources', () => {
   const data: CloudPulseResources[] = [
     { engineType: 'mysql', id: '1', label: 'Test', region: regions[0].id },
     { engineType: 'mysql', id: '2', label: 'Test2', region: regions[1].id },
+    { engineType: undefined, id: '4', label: 'Test4', region: 'us-central' },
     {
       engineType: 'postgresql',
       id: '3',
@@ -103,6 +104,7 @@ describe('getFilteredResources', () => {
       }).map(({ id, label }) => `${label} (${id})`),
       regionsIdToRegionMap,
       resourceIds: ['1', '2'],
+      supportedRegions: undefined,
     });
     expect(result.length).toBe(2);
     expect(result[0].label).toBe(data[0].label);
@@ -120,6 +122,7 @@ describe('getFilteredResources', () => {
         regionsIdToRegionMap,
         resourceIds: ['1', '2'],
         searchText: data[1].label,
+        supportedRegions: undefined,
       });
     expect(result.length).toBe(1);
     expect(result[0].label).toBe(data[1].label);
@@ -135,6 +138,7 @@ describe('getFilteredResources', () => {
       regionsIdToRegionMap,
       resourceIds: ['1', '2'],
       searchText: data[1].label,
+      supportedRegions: undefined,
     });
     expect(result.length).toBe(0);
   });
@@ -144,6 +148,7 @@ describe('getFilteredResources', () => {
       filteredRegions: [],
       regionsIdToRegionMap,
       resourceIds: ['1', '2'],
+      supportedRegions: undefined,
     });
     expect(result.length).toBe(0);
   });
@@ -153,6 +158,7 @@ describe('getFilteredResources', () => {
       filteredRegions: [],
       regionsIdToRegionMap,
       resourceIds: ['1', '2'],
+      supportedRegions: undefined,
     });
     expect(result.length).toBe(0);
   });
@@ -165,6 +171,7 @@ describe('getFilteredResources', () => {
         resourceIds: ['1', '2'],
         searchText: '',
         selectedResources: ['1'],
+        supportedRegions: undefined,
       });
     expect(result.length).toBe(2);
     expect(result[0].checked).toBe(true);
@@ -179,6 +186,7 @@ describe('getFilteredResources', () => {
         resourceIds: [],
         searchText: undefined,
         selectedResources: ['1'],
+        supportedRegions: undefined,
       });
     expect(result.length).toBe(data.length);
   });
@@ -191,6 +199,7 @@ describe('getFilteredResources', () => {
       filteredRegions: [],
       regionsIdToRegionMap,
       resourceIds: ['1', '2', '3'],
+      supportedRegions: undefined,
     });
     expect(result.length).toBe(1);
   });
@@ -203,7 +212,38 @@ describe('getFilteredResources', () => {
       filteredRegions: [],
       regionsIdToRegionMap,
       resourceIds: ['1', '2', '3'],
+      supportedRegions: undefined,
     });
     expect(result.length).toBe(3);
+  });
+  it('should return correct results if supported regions are defined and one or more regions are selected', () => {
+    const result = getFilteredResources({
+      additionalFilters: {
+        engineType: undefined,
+      },
+      data,
+      filteredRegions: getRegionOptions({
+        data,
+        regionsIdToRegionMap,
+        resourceIds: ['1', '4'],
+      }).map(({ id, label }) => `${label} (${id})`),
+      regionsIdToRegionMap,
+      resourceIds: ['1', '2', '3', '4'],
+      supportedRegions: regionFactory.buildList(1, { id: 'us-central' }),
+    });
+    expect(result.length).toBe(1);
+  });
+  it('should return correct results if supported regions are defined and no region is selected', () => {
+    const result = getFilteredResources({
+      additionalFilters: {
+        engineType: undefined,
+      },
+      data,
+      filteredRegions: [],
+      regionsIdToRegionMap,
+      resourceIds: ['1', '2', '3', '4'],
+      supportedRegions: regionFactory.buildList(1, { id: 'us-central' }),
+    });
+    expect(result.length).toBe(1);
   });
 });
