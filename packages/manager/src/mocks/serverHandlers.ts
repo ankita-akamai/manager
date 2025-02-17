@@ -696,6 +696,7 @@ export const handlers = [
         tags: ['test1', 'test2'],
       }),
       linodeFactory.build({
+        id: 52,
         label: 'linode_with_tags_test2_test3',
         region: 'us-central',
         tags: ['test2', 'test3'],
