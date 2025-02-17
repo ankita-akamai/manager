@@ -245,13 +245,10 @@ describe('getFilteredResources', () => {
       filteredRegions: [],
       regionsIdToRegionMap,
       resourceIds: ['1', '2', '3', '4', '5'],
-      supportedRegions: getSupportedRegionOptions(
-        mockResourceTypeMap,
-        'linode',
-        regions
-      ) as Region[],
+      supportedRegions: [regionFactory.build({ id: 'us-east' })],
     });
-    expect(result.length).toBe(2);
+    expect(result.length).toBe(1);
+    expect(result[0].id).toBe('4');
   });
   it('should return correct results if supported regions are defined and no region is selected', () => {
     const result = getFilteredResources({
@@ -262,13 +259,10 @@ describe('getFilteredResources', () => {
       filteredRegions: [],
       regionsIdToRegionMap,
       resourceIds: ['2', '3', '4', '5'],
-      supportedRegions: getSupportedRegionOptions(
-        mockResourceTypeMap,
-        'linode',
-        regions
-      ),
+      supportedRegions: [regionFactory.build({ id: 'us-west' })],
     });
-    expect(result.length).toBe(2);
+    expect(result.length).toBe(1);
+    expect(result[0].id).toBe('5');
   });
 });
 
