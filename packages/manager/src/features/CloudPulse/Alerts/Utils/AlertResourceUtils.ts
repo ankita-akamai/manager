@@ -89,6 +89,9 @@ interface FilterRendererProps {
    */
   regionOptions?: Region[];
 
+  /**
+   * The supported regions defined in launch darkly per service type
+   */
   supportedRegions?: Region[];
 }
 
