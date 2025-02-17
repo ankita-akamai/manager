@@ -98,8 +98,8 @@ describe('getRegionOptions', () => {
 describe('getFilteredResources', () => {
   const regions = [
     ...regionFactory.buildList(10),
-    regionFactory.build({ id: 'us-east' }),
-    regionFactory.build({ id: 'us-west' }),
+    regionFactory.build({ id: 'us-east', label: 'NJ' }),
+    regionFactory.build({ id: 'us-west', label: 'NJ' }),
   ];
   const regionsIdToRegionMap = getRegionsIdRegionMap(regions);
   const data: CloudPulseResources[] = [
@@ -242,10 +242,10 @@ describe('getFilteredResources', () => {
         engineType: undefined,
       },
       data,
-      filteredRegions: [],
+      filteredRegions: ['NJ (us-east)'],
       regionsIdToRegionMap,
       resourceIds: ['1', '2', '3', '4', '5'],
-      supportedRegions: [regionFactory.build({ id: 'us-east' })],
+      supportedRegions: [regionFactory.build({ id: 'us-east', label: 'NJ' })],
     });
     expect(result.length).toBe(1);
     expect(result[0].id).toBe('4');
@@ -259,7 +259,7 @@ describe('getFilteredResources', () => {
       filteredRegions: [],
       regionsIdToRegionMap,
       resourceIds: ['2', '3', '4', '5'],
-      supportedRegions: [regionFactory.build({ id: 'us-west' })],
+      supportedRegions: [regionFactory.build({ id: 'us-west', label: 'NJ' })],
     });
     expect(result.length).toBe(1);
     expect(result[0].id).toBe('5');
