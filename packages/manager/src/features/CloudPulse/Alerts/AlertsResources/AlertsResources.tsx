@@ -14,6 +14,7 @@ import {
   getFilteredResources,
   getRegionOptions,
   getRegionsIdRegionMap,
+  getSupportedRegionOptions,
   scrollToElement,
 } from '../Utils/AlertResourceUtils';
 import { AlertResourcesFilterRenderer } from './AlertsResourcesFilterRenderer';
@@ -34,7 +35,6 @@ import type {
   Filter,
   Region,
 } from '@linode/api-v4';
-import type { CloudPulseResourceTypeMapFlag } from 'src/featureFlags';
 
 export interface AlertResourcesProp {
   /**
@@ -181,26 +181,11 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
   const flags = useFlags();
 
   // Validate launchDarkly region ids with the ids from regionOptions prop
-  const supportedRegions = React.useMemo<Region[] | undefined>(() => {
-    const resourceTypeFlag = flags.aclpResourceTypeMap?.find(
-      (item: CloudPulseResourceTypeMapFlag) => item.serviceType === serviceType
-    );
-
-    if (
-      resourceTypeFlag?.supportedRegionIds === null ||
-      resourceTypeFlag?.supportedRegionIds === undefined
-    ) {
-      return regionOptions;
-    }
-
-    const supportedRegionsIdList = resourceTypeFlag.supportedRegionIds
-      .split(',')
-      .map((regionId: string) => regionId.trim());
-
-    return regionOptions?.filter((region) =>
-      supportedRegionsIdList.includes(region.id)
-    );
-  }, [flags.aclpResourceTypeMap, regionOptions, serviceType]);
+  const supportedRegions: Region[] | undefined = getSupportedRegionOptions(
+    flags.aclpResourceTypeMap,
+    serviceType,
+    regionOptions
+  );
 
   const isDataLoadingError = isRegionsError || isResourcesError;
 
@@ -367,6 +352,7 @@ export const AlertResources = React.memo((props: AlertResourcesProp) => {
                   filterKey,
                   handleFilterChange,
                   handleFilteredRegionsChange,
+                  regionOptions,
                   supportedRegions,
                 })}
                 component={component}

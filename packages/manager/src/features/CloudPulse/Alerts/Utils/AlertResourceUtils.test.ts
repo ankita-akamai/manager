@@ -4,9 +4,24 @@ import {
   getFilteredResources,
   getRegionOptions,
   getRegionsIdRegionMap,
+  getSupportedRegionOptions,
 } from './AlertResourceUtils';
 
 import type { CloudPulseResources } from '../../shared/CloudPulseResourcesSelect';
+import type { Region } from '@linode/api-v4';
+import type { CloudPulseResourceTypeMapFlag } from 'src/featureFlags';
+
+const mockResourceTypeMap: CloudPulseResourceTypeMapFlag[] = [
+  {
+    dimensionKey: 'LINODE_ID',
+    serviceType: 'linode',
+    supportedRegionIds: 'us-east, us-west',
+  },
+  {
+    dimensionKey: 'cluster_id',
+    serviceType: 'dbaas',
+  },
+];
 
 describe('getRegionsIdLabelMap', () => {
   it('should return a proper map for given regions', () => {
@@ -81,12 +96,17 @@ describe('getRegionOptions', () => {
 });
 
 describe('getFilteredResources', () => {
-  const regions = regionFactory.buildList(10);
+  const regions = [
+    ...regionFactory.buildList(10),
+    regionFactory.build({ id: 'us-east' }),
+    regionFactory.build({ id: 'us-west' }),
+  ];
   const regionsIdToRegionMap = getRegionsIdRegionMap(regions);
   const data: CloudPulseResources[] = [
     { engineType: 'mysql', id: '1', label: 'Test', region: regions[0].id },
     { engineType: 'mysql', id: '2', label: 'Test2', region: regions[1].id },
-    { engineType: undefined, id: '4', label: 'Test4', region: 'us-central' },
+    { engineType: undefined, id: '4', label: 'Test4', region: 'us-east' },
+    { engineType: undefined, id: '5', label: 'Test5', region: 'us-west' },
     {
       engineType: 'postgresql',
       id: '3',
@@ -222,16 +242,16 @@ describe('getFilteredResources', () => {
         engineType: undefined,
       },
       data,
-      filteredRegions: getRegionOptions({
-        data,
-        regionsIdToRegionMap,
-        resourceIds: ['1', '4'],
-      }).map(({ id, label }) => `${label} (${id})`),
+      filteredRegions: [],
       regionsIdToRegionMap,
-      resourceIds: ['1', '2', '3', '4'],
-      supportedRegions: regionFactory.buildList(1, { id: 'us-central' }),
+      resourceIds: ['1', '2', '3', '4', '5'],
+      supportedRegions: getSupportedRegionOptions(
+        mockResourceTypeMap,
+        'linode',
+        regions
+      ) as Region[],
     });
-    expect(result.length).toBe(1);
+    expect(result.length).toBe(2);
   });
   it('should return correct results if supported regions are defined and no region is selected', () => {
     const result = getFilteredResources({
@@ -241,9 +261,41 @@ describe('getFilteredResources', () => {
       data,
       filteredRegions: [],
       regionsIdToRegionMap,
-      resourceIds: ['1', '2', '3', '4'],
-      supportedRegions: regionFactory.buildList(1, { id: 'us-central' }),
+      resourceIds: ['2', '3', '4', '5'],
+      supportedRegions: getSupportedRegionOptions(
+        mockResourceTypeMap,
+        'linode',
+        regions
+      ),
     });
-    expect(result.length).toBe(1);
+    expect(result.length).toBe(2);
+  });
+});
+
+describe('getSupportedRegionOptions', () => {
+  const regions = [
+    regionFactory.build({ country: 'us', id: 'us-east', label: 'Newark, NJ' }),
+    regionFactory.build({ country: 'us', id: 'us-west', label: 'Fremont, CA' }),
+    regionFactory.build({ country: 'uk', id: 'eu-west', label: 'London, UK' }),
+  ];
+
+  it('returns filtered regions based on supported region ids', () => {
+    const result = getSupportedRegionOptions(
+      mockResourceTypeMap,
+      'linode',
+      regions
+    ) as Region[];
+
+    expect(result[0].id).toEqual('us-east');
+    expect(result[1].id).toEqual('us-west');
+  });
+
+  it('returns undefined when supported region ids are undefined', () => {
+    const result = getSupportedRegionOptions(
+      mockResourceTypeMap,
+      'dbaas',
+      regions
+    );
+    expect(result).toBeUndefined();
   });
 });

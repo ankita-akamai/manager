@@ -12,7 +12,8 @@ import type {
   AlertFilterKey,
   AlertFilterType,
 } from '../AlertsResources/types';
-import type { Region } from '@linode/api-v4';
+import type { AlertServiceType, Region } from '@linode/api-v4';
+import type { CloudPulseResourceTypeMapFlag } from 'src/featureFlags';
 
 interface FilterResourceProps {
   /**
@@ -87,7 +88,7 @@ interface FilterRendererProps {
   /**
    * The regions to be displayed according to the resources associated with alerts
    */
-  regionOptions?: Region[];
+  regionOptions: Region[];
 
   /**
    * The supported regions defined in launch darkly per service type
@@ -140,6 +141,37 @@ export const getRegionOptions = (
     }
   });
   return Array.from(uniqueRegions);
+};
+
+/**
+ * @param aclpResourceTypeMap The launch darkly flag where supported region ids are listed
+ * @param serviceType The service type associated with the alerts
+ * @param regionOptions Array of regions associated with the alerts
+ * @returns Array of supported regions associated with the resource ids of the alert
+ */
+export const getSupportedRegionOptions = (
+  aclpResourceTypeMap: CloudPulseResourceTypeMapFlag[] | undefined,
+  serviceType: AlertServiceType | undefined,
+  regionOptions: Region[]
+): Region[] | undefined => {
+  const resourceTypeFlag = aclpResourceTypeMap?.find(
+    (item: CloudPulseResourceTypeMapFlag) => item.serviceType === serviceType
+  );
+
+  if (
+    resourceTypeFlag?.supportedRegionIds === null ||
+    resourceTypeFlag?.supportedRegionIds === undefined
+  ) {
+    return undefined;
+  }
+
+  const supportedRegionsIdList = resourceTypeFlag.supportedRegionIds
+    .split(',')
+    .map((regionId: string) => regionId.trim());
+
+  return regionOptions.filter((region) =>
+    supportedRegionsIdList.includes(region.id)
+  );
 };
 
 /**
@@ -305,18 +337,23 @@ export const isResourcesEqual = (
  * @param {(selectedRegions: string[]) => void} props.handleFilteredRegionsChange -
  *        Callback function for updating the selected regions.
  * @param {Region[]} props.regionOptions - The list of available regions for filtering.
+ * @param {Region[]} props.supportedRegions - The list of supported regions.
  */
 export const getAlertResourceFilterProps = ({
   filterKey,
   handleFilterChange,
   handleFilteredRegionsChange: handleSelectionChange,
+  regionOptions,
   supportedRegions,
 }: FilterRendererProps): AlertsEngineOptionProps | AlertsRegionProps => {
   switch (filterKey) {
     case 'engineType':
       return { handleFilterChange };
     case 'region':
-      return { handleSelectionChange, regionOptions: supportedRegions ?? [] };
+      return {
+        handleSelectionChange,
+        regionOptions: supportedRegions ?? regionOptions,
+      };
 
     default:
       return { handleFilterChange };
