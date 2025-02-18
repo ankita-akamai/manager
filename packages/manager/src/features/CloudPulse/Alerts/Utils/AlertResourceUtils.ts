@@ -169,9 +169,7 @@ export const getSupportedRegionOptions = (
     .split(',')
     .map((regionId: string) => regionId.trim());
 
-  return regionOptions.filter((region) =>
-    supportedRegionsIdList.includes(region.id)
-  );
+  return regionOptions.filter(({ id }) => supportedRegionsIdList.includes(id));
 };
 
 /**
