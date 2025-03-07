@@ -76,7 +76,7 @@ describe('EditAlertDefinition component', () => {
       const push = vi.fn();
       const history = createMemoryHistory();
       history.push = push;
-      history.push('/monitor/alerts/definitions/edit/linode/1');
+      history.push('/alerts/definitions/edit/linode/1');
       const mutateAsyncSpy = queryMocks.useEditAlertDefinition().mutateAsync;
       const { getByPlaceholderText, getByText } = renderWithTheme(
         <Router history={history}>
@@ -100,7 +100,7 @@ describe('EditAlertDefinition component', () => {
 
       await waitFor(() => expect(mutateAsyncSpy).toHaveBeenCalledTimes(1));
 
-      expect(push).toHaveBeenLastCalledWith('/monitor/alerts/definitions');
+      expect(push).toHaveBeenLastCalledWith('/alerts/definitions');
       await waitFor(() => {
         expect(
           getByText('Alert successfully updated.') // validate whether snackbar is displayed properly
