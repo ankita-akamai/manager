@@ -738,6 +738,9 @@ export const handlers = [
   }),
   http.get('*/linode/instances', async ({ request }) => {
     linodeFactory.resetSequenceNumber();
+    const linodeWithRegionFilter = linodeFactory.buildList(10, {
+      region: 'us-iad',
+    });
     const metadataLinodeWithCompatibleImage = linodeFactory.build({
       image: 'metadata-test-image',
       label: 'metadata-test-image',
@@ -814,6 +817,7 @@ export const handlers = [
       }),
     ];
     const linodes = [
+      ...linodeWithRegionFilter,
       ...mtcLinodes,
       ...aclpSupportedRegionLinodes,
       nonMTCPlanInMTCSupportedRegionsLinode,
@@ -868,54 +872,54 @@ export const handlers = [
       multipleIPLinode,
     ];
 
-    if (request.headers.get('x-filter')) {
-      const headers = JSON.parse(request.headers.get('x-filter') || '{}');
-      const orFilters = headers['+or'];
-      const andFilters = headers['+and'];
-      const regionFilter = headers.region;
+    // if (request.headers.get('x-filter')) {
+    //   const headers = JSON.parse(request.headers.get('x-filter') || '{}');
+    //   const orFilters = headers['+or'];
+    //   const andFilters = headers['+and'];
+    //   const regionFilter = headers.region;
 
-      let filteredLinodes = linodes; // Default to the original linodes in case no filters are applied
+    //   let filteredLinodes = linodes; // Default to the original linodes in case no filters are applied
 
-      // filter the linodes based on id or region
-      if (andFilters?.length) {
-        filteredLinodes = filteredLinodes.filter((linode) => {
-          const filteredById = andFilters.every(
-            (filter: { id: number }) => filter.id === linode.id
-          );
-          const filteredByRegion = andFilters.every(
-            (filter: { region: string }) => filter.region === linode.region
-          );
+    //   // filter the linodes based on id or region
+    //   if (andFilters?.length) {
+    //     filteredLinodes = filteredLinodes.filter((linode) => {
+    //       const filteredById = andFilters.every(
+    //         (filter: { id: number }) => filter.id === linode.id
+    //       );
+    //       const filteredByRegion = andFilters.every(
+    //         (filter: { region: string }) => filter.region === linode.region
+    //       );
 
-          return filteredById || filteredByRegion;
-        });
-      }
+    //       return filteredById || filteredByRegion;
+    //     });
+    //   }
 
-      // after the linodes are filtered based on region, filter the region-filtered linodes based on selected tags if any
-      if (orFilters?.length) {
-        filteredLinodes = filteredLinodes.filter((linode) => {
-          return orFilters.some((filter: { tags: string }) =>
-            linode.tags.includes(filter.tags)
-          );
-        });
-      }
+    //   // after the linodes are filtered based on region, filter the region-filtered linodes based on selected tags if any
+    //   if (orFilters?.length) {
+    //     filteredLinodes = filteredLinodes.filter((linode) => {
+    //       return orFilters.some((filter: { tags: string }) =>
+    //         linode.tags.includes(filter.tags)
+    //       );
+    //     });
+    //   }
 
-      // filter the linodes based on supported regions
-      if (orFilters?.length) {
-        filteredLinodes = linodes.filter((linode) => {
-          return orFilters.some(
-            (filter: { region: string }) => linode.region === filter.region
-          );
-        });
-      }
+    //   // filter the linodes based on supported regions
+    //   if (orFilters?.length) {
+    //     filteredLinodes = linodes.filter((linode) => {
+    //       return orFilters.some(
+    //         (filter: { region: string }) => linode.region === filter.region
+    //       );
+    //     });
+    //   }
 
-      if (regionFilter) {
-        filteredLinodes = filteredLinodes.filter((linode) => {
-          return linode.region === regionFilter;
-        });
-      }
+    //   if (regionFilter) {
+    //     filteredLinodes = filteredLinodes.filter((linode) => {
+    //       return linode.region === regionFilter;
+    //     });
+    //   }
 
-      return HttpResponse.json(makeResourcePage(filteredLinodes));
-    }
+    //   return HttpResponse.json(makeResourcePage(filteredLinodes));
+    // }
     return HttpResponse.json(makeResourcePage(linodes));
   }),
 
@@ -1100,7 +1104,14 @@ export const handlers = [
     return HttpResponse.json({});
   }),
   http.get('*/v4beta/networking/firewalls', () => {
-    const firewalls = firewallFactory.buildList(10);
+    const firewalls = firewallFactory.buildList(10, {
+      entities: [
+        {
+          id: 1,
+          type: 'linode',
+        },
+      ],
+    });
     firewallFactory.resetSequenceNumber();
     return HttpResponse.json(makeResourcePage(firewalls));
   }),
