@@ -34,7 +34,6 @@ import type {
   JWETokenPayLoad,
   Params,
 } from '@linode/api-v4';
-import type { CloudPulseObjectStorageBucket } from 'src/features/CloudPulse/shared/types';
 
 const key = 'Clousepulse';
 
@@ -156,16 +155,11 @@ const getAllBuckets = async () => {
   // get all the buckets from the endpoints
   const allBuckets = await getAllBucketsFromEndpoints(endpoints);
   // filter out the buckets that are not GEN2
-  const objGEN2Buckets = allBuckets.buckets.filter(
+  if (allBuckets.errors.length) {
+    throw new Error('Unable to fetch the data.');
+  }
+  return allBuckets.buckets.filter(
+    // filtering out E0 and E1 and returning only Gen2 Storage Buckets
     (bucket) => bucket.endpoint_type !== 'E0' && bucket.endpoint_type !== 'E1'
   );
-  const tranformedBuckets: CloudPulseObjectStorageBucket[] = objGEN2Buckets.map(
-    (bucket) => ({
-      ...bucket,
-      error: allBuckets.errors.find(
-        (error) => error.endpoint.s3_endpoint === bucket.s3_endpoint
-      )?.error,
-    })
-  );
-  return tranformedBuckets;
 };

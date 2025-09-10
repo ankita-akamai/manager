@@ -377,6 +377,7 @@ export const capabilityServiceTypeMapping: Record<
   dbaas: 'Managed Databases',
   nodebalancer: 'NodeBalancers',
   firewall: 'Cloud Firewall',
+  objectstorage: 'Object Storage',
 };
 
 /**

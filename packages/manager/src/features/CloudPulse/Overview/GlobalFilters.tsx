@@ -108,7 +108,16 @@ export const GlobalFilters = React.memo((props: GlobalFilterProperties) => {
 
     RESOURCE_FILTER_MAP[selectedDashboard?.service_type ?? ''] ?? {}
   );
-  console.log('resources', resources);
+  console.log(
+    'serviceType: ',
+    selectedDashboard?.service_type,
+    '\nresources: ',
+    resources,
+    '\nresources error: ',
+    isError,
+    '\nresources isLoading',
+    isLoading
+  );
 
   return (
     <GridLegacy container>

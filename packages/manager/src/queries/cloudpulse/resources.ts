@@ -14,6 +14,7 @@ export const useResourcesQuery = (
   useQuery<any[], unknown, CloudPulseResources[]>({
     ...queryFactory.resources(resourceType, params, filters),
     enabled,
+    retry: resourceType === 'objectstorage' ? false : 3,
     select: (resources) => {
       return resources.map((resource) => {
         const entities: Record<string, string> = {};
