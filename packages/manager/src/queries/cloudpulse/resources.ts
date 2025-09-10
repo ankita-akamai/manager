@@ -52,7 +52,6 @@ export const useResourcesQuery = (
           tags: resource.tags,
           entities,
           clusterSize: resource.cluster_size,
-          error: resource.error,
         };
       });
     },

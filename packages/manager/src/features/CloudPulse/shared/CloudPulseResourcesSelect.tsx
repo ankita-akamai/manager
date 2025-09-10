@@ -16,7 +16,6 @@ export interface CloudPulseResources {
   endpoint?: string;
   engineType?: string;
   entities?: Record<string, string>;
-  error?: string;
   id: string;
   label: string;
   region?: string;
