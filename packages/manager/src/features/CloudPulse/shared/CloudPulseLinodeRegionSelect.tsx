@@ -162,10 +162,10 @@ export const CloudPulseLinodeRegionSelect = React.memo(
         );
         setSelectedRegion(region?.id);
       } else {
-        if (disabled && selectedRegion !== undefined) {
+        if (selectedRegion !== undefined) {
           setSelectedRegion('');
-          handleLinodeRegionChange(filterKey, undefined, []);
         }
+        handleLinodeRegionChange(filterKey, undefined, []);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
