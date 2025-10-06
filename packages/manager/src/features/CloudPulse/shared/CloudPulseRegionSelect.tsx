@@ -115,7 +115,7 @@ export const CloudPulseRegionSelect = React.memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
       xFilter, // Reacts to filter changes (to reset region)
-      supportedRegionsFromResources, // Function to call on change
+      supportedRegionsFromResources, // Reacts to region changes
     ]);
 
     return (
