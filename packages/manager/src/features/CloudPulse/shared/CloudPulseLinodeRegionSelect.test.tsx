@@ -135,12 +135,7 @@ describe('CloudPulseRegionSelect', () => {
       isError: true,
       isLoading: false,
     });
-    const updatedProps = {
-      ...props,
-      selectedDashboard: firewallDashboard,
-    };
-    renderWithTheme(<CloudPulseLinodeRegionSelect {...updatedProps} />);
-
+    renderWithTheme(<CloudPulseLinodeRegionSelect {...props} />);
     expect(screen.getByText(errorMsg)).toBeVisible();
   });
 
@@ -148,10 +143,7 @@ describe('CloudPulseRegionSelect', () => {
     const user = userEvent.setup();
 
     renderWithTheme(
-      <CloudPulseLinodeRegionSelect
-        {...props}
-        selectedDashboard={firewallDashboard}
-      />
+      <CloudPulseLinodeRegionSelect {...props} selectedEntities={['1']} />
     );
 
     // resources are present only in us-west, no other regions like us-east here should be listed
@@ -181,12 +173,7 @@ describe('CloudPulseRegionSelect', () => {
       isLoading: false,
     });
     // There are no aclp supported regions for firewall service type as returned by useRegionsQuery above
-    renderWithTheme(
-      <CloudPulseLinodeRegionSelect
-        {...props}
-        selectedDashboard={firewallDashboard}
-      />
-    );
+    renderWithTheme(<CloudPulseLinodeRegionSelect {...props} />);
     await user.click(screen.getByRole('button', { name: 'Open' }));
     expect(screen.getByText(NO_REGION_MESSAGE['firewall'])).toBeVisible();
   });
