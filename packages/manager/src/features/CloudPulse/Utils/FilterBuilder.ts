@@ -18,6 +18,7 @@ import type {
   CloudPulseEndpoints,
   CloudPulseEndpointsSelectProps,
 } from '../shared/CloudPulseEndpointsSelect';
+import type { CloudPulseLinodeRegionSelectProps } from '../shared/CloudPulseLinodeRegionSelect';
 import type { CloudPulseNodeTypeFilterProps } from '../shared/CloudPulseNodeTypeFilter';
 import type { CloudPulseRegionSelectProps } from '../shared/CloudPulseRegionSelect';
 import type {
@@ -125,6 +126,52 @@ export const getRegionProperties = (
   return {
     defaultValue: preferences?.[filterKey],
     handleRegionChange,
+    filterKey,
+    label,
+    placeholder,
+    savePreferences: !isServiceAnalyticsIntegration,
+    selectedDashboard: dashboard,
+    disabled:
+      shouldDisable ||
+      shouldDisableFilterByFilterKey(
+        filterKey,
+        dependentFilters ?? {},
+        dashboard
+      ),
+    xFilter: filterBasedOnConfig(config, dependentFilters ?? {}),
+  };
+};
+
+/**
+ * This function helps in building the properties needed for the linode-region selection component
+ *
+ * @param config - accepts a CloudPulseServiceTypeFilters of region key
+ * @param handleLinodeRegionChange - the callback when we select new region
+ * @param dashboard - the actual selected dashboard
+ * @param isServiceAnalyticsIntegration - only if this is false, we need to save preferences , else no need
+ * @returns CloudPulseLinodeRegionSelectProps
+ */
+export const getLinodeRegionProperties = (
+  props: CloudPulseFilterProperties,
+  handleLinodeRegionChange: (
+    filterKey: string,
+    region: string | undefined,
+    labels: string[],
+    savePref?: boolean
+  ) => void
+): CloudPulseLinodeRegionSelectProps => {
+  const { name: label, placeholder, filterKey } = props.config.configuration;
+  const {
+    dashboard,
+    isServiceAnalyticsIntegration,
+    preferences,
+    dependentFilters,
+    config,
+    shouldDisable,
+  } = props;
+  return {
+    defaultValue: preferences?.[filterKey],
+    handleLinodeRegionChange,
     filterKey,
     label,
     placeholder,

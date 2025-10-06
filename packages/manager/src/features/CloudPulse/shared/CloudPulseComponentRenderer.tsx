@@ -6,6 +6,7 @@ import NullComponent from 'src/components/NullComponent';
 import { CloudPulseCustomSelect } from './CloudPulseCustomSelect';
 import { CloudPulseDateTimeRangePicker } from './CloudPulseDateTimeRangePicker';
 import { CloudPulseEndpointsSelect } from './CloudPulseEndpointsSelect';
+import { CloudPulseLinodeRegionSelect } from './CloudPulseLinodeRegionSelect';
 import { CloudPulseNodeTypeFilter } from './CloudPulseNodeTypeFilter';
 import { CloudPulseRegionSelect } from './CloudPulseRegionSelect';
 import { CloudPulseResourcesSelect } from './CloudPulseResourcesSelect';
@@ -15,6 +16,7 @@ import { CloudPulseTextFilter } from './CloudPulseTextFilter';
 import type { CloudPulseCustomSelectProps } from './CloudPulseCustomSelect';
 import type { CloudPulseDateTimeRangePickerProps } from './CloudPulseDateTimeRangePicker';
 import type { CloudPulseEndpointsSelectProps } from './CloudPulseEndpointsSelect';
+import type { CloudPulseLinodeRegionSelectProps } from './CloudPulseLinodeRegionSelect';
 import type { CloudPulseNodeTypeFilterProps } from './CloudPulseNodeTypeFilter';
 import type { CloudPulseRegionSelectProps } from './CloudPulseRegionSelect';
 import type { CloudPulseResourcesSelectProps } from './CloudPulseResourcesSelect';
@@ -27,6 +29,7 @@ export interface CloudPulseComponentRendererProps {
     | CloudPulseCustomSelectProps
     | CloudPulseDateTimeRangePickerProps
     | CloudPulseEndpointsSelectProps
+    | CloudPulseLinodeRegionSelectProps
     | CloudPulseNodeTypeFilterProps
     | CloudPulseRegionSelectProps
     | CloudPulseResourcesSelectProps
@@ -41,6 +44,7 @@ const Components: {
       | CloudPulseCustomSelectProps
       | CloudPulseDateTimeRangePickerProps
       | CloudPulseEndpointsSelectProps
+      | CloudPulseLinodeRegionSelectProps
       | CloudPulseNodeTypeFilterProps
       | CloudPulseRegionSelectProps
       | CloudPulseResourcesSelectProps
@@ -57,7 +61,7 @@ const Components: {
   relative_time_duration: CloudPulseDateTimeRangePicker,
   resource_id: CloudPulseResourcesSelect,
   tags: CloudPulseTagsSelect,
-  associated_entity_region: CloudPulseRegionSelect,
+  associated_entity_region: CloudPulseLinodeRegionSelect,
   endpoint: CloudPulseEndpointsSelect,
 };
 

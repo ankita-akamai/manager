@@ -15,6 +15,7 @@ import {
   filterUsingDependentFilters,
   getEndpointsProperties,
   getFilters,
+  getLinodeRegionProperties,
   getTextFilterProperties,
 } from './FilterBuilder';
 import {
@@ -699,5 +700,45 @@ describe('filterBasedOnConfig', () => {
       engineType: 'mysql',
       tags: ['db', 'prod'],
     });
+  });
+
+  it('test getLinodeRegionProperties', () => {
+    const regionConfig = firewallConfig?.filters.find(
+      (filterObj) => filterObj.name === 'Linode Region'
+    );
+
+    expect(regionConfig).toBeDefined();
+
+    if (regionConfig) {
+      const {
+        filterKey,
+        selectedDashboard,
+        handleLinodeRegionChange,
+        defaultValue,
+        label,
+        disabled,
+        xFilter,
+        selectedEntities,
+        savePreferences,
+      } = getLinodeRegionProperties(
+        {
+          config: regionConfig,
+          dashboard: mockDashboard,
+          isServiceAnalyticsIntegration: false,
+          dependentFilters: { resource_id: ['1', '2'] },
+        },
+        vi.fn()
+      );
+      const { name } = regionConfig.configuration;
+      expect(selectedDashboard).toEqual(mockDashboard);
+      expect(filterKey).toEqual('associated_entity_region');
+      expect(handleLinodeRegionChange).toBeDefined();
+      expect(defaultValue).toEqual(undefined);
+      expect(label).toEqual(name);
+      expect(disabled).toEqual(false);
+      expect(xFilter).toEqual({ resource_id: ['1', '2'] });
+      expect(selectedEntities).toEqual(['1', '2']);
+      expect(savePreferences).toEqual(true);
+    }
   });
 });

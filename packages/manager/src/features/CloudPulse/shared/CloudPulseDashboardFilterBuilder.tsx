@@ -24,6 +24,7 @@ import {
   getCustomSelectProperties,
   getEndpointsProperties,
   getFilters,
+  getLinodeRegionProperties,
   getNodeTypeProperties,
   getRegionProperties,
   getResourcesProperties,
@@ -216,6 +217,7 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
           savePref,
           {
             [NODE_TYPE]: undefined,
+            [LINODE_REGION]: undefined,
             [RESOURCES]: resourceId.map((resource: { id: string }) =>
               String(resource.id)
             ),
@@ -232,17 +234,33 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
         labels: string[],
         savePref: boolean = false
       ) => {
-        const updatedPreferenceData =
-          filterKey === REGION
-            ? {
-                [filterKey]: region,
-                [ENDPOINT]: undefined,
-                [RESOURCES]: undefined,
-                [TAGS]: undefined,
-              }
-            : {
-                [filterKey]: region,
-              };
+        const updatedPreferenceData = {
+          [filterKey]: region,
+          [ENDPOINT]: undefined,
+          [RESOURCES]: undefined,
+          [TAGS]: undefined,
+        };
+        emitFilterChangeByFilterKey(
+          filterKey,
+          region,
+          labels,
+          savePref,
+          updatedPreferenceData
+        );
+      },
+      [emitFilterChangeByFilterKey]
+    );
+
+    const handleLinodeRegionChange = React.useCallback(
+      (
+        filterKey: string,
+        region: string | undefined,
+        labels: string[],
+        savePref: boolean = false
+      ) => {
+        const updatedPreferenceData = {
+          [filterKey]: region,
+        };
         emitFilterChangeByFilterKey(
           filterKey,
           region,
@@ -310,7 +328,7 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
             handleRegionChange
           );
         } else if (config.configuration.filterKey === LINODE_REGION) {
-          return getRegionProperties(
+          return getLinodeRegionProperties(
             {
               config,
               dashboard,
@@ -321,7 +339,7 @@ export const CloudPulseDashboardFilterBuilder = React.memo(
                 : dependentFilterReference.current,
               shouldDisable: isError || isLoading,
             },
-            handleRegionChange
+            handleLinodeRegionChange
           );
         } else if (config.configuration.filterKey === RESOURCE_ID) {
           return getResourcesProperties(
