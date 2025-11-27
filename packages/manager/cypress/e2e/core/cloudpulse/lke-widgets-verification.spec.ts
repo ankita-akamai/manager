@@ -31,6 +31,7 @@ import {
   widgetFactory,
 } from 'src/factories';
 import { generateGraphData } from 'src/features/CloudPulse/Utils/CloudPulseWidgetUtils';
+import { CLUSTERS_TOOLTIP_TEXT } from 'src/features/CloudPulse/Utils/constants';
 import { formatToolTip } from 'src/features/CloudPulse/Utils/unitConversion';
 
 import type { CloudPulseMetricsResponse } from '@linode/api-v4';
@@ -246,6 +247,8 @@ describe('Integration Tests for LKE Enterprise Dashboard ', () => {
       .findByLabel('Clusters')
       .should('be.visible')
       .as('clusterDropdown');
+
+    ui.tooltip.findByText(CLUSTERS_TOOLTIP_TEXT).should('be.visible');
 
     cy.get('@clusterDropdown').click();
 
