@@ -52,6 +52,7 @@ import {
   creditPaymentResponseFactory,
   dashboardFactory,
   databaseBackupFactory,
+  databaseConnectionPoolFactory,
   databaseEngineFactory,
   databaseFactory,
   databaseInstanceFactory,
@@ -211,6 +212,11 @@ const makeMockDatabase = (params: PathParams): Database => {
 
     db.ssl_connection = true;
   }
+
+  if (db.engine === 'postgresql') {
+    db.connection_pool_port = 100;
+  }
+
   const database = databaseFactory.build(db);
 
   if (database.platform !== 'rdbms-default') {
@@ -368,6 +374,11 @@ const databases = [
     const combinedList = [...engine1, ...engine2];
 
     return HttpResponse.json(makeResourcePage(combinedList));
+  }),
+
+  http.get('*/databases/postgresql/instances/:id/connection-pools', () => {
+    const connectionPools = databaseConnectionPoolFactory.buildList(5);
+    return HttpResponse.json(makeResourcePage(connectionPools));
   }),
 
   http.get('*/databases/:engine/instances/:id', ({ params }) => {
